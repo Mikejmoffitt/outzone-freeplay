@@ -4,18 +4,21 @@
 	ORG		$000000
 	BINCLUDE	"prg.orig"
 
+; Free space at the end of the ROM.
 ROM_FREE = $03FD84
 
 ; For free play, we will use the first unused switch of DSWA. When set, Free
 ; Play is enabled.
-
 DSWALoc = $240B45  ; <-- free play when bit 0 is set.
-DSWBLoc = $240B47
 
-CreditCountLoc = $240B4B
+; The sub CPU handles credit counting, and places the credit count in shared memory.
 SubCpuCreditLoc = $140005
 
-; prints a string selected by d0. Location is predetermined by metadata.
+; This is copied from the sub CPU for the main CPU to act on.
+CreditCountLoc = $240B4B
+
+; Function that prints a string selected by d0. Location and other attributes
+; are predetermined by a mapping table at $01500C.
 StringMetaPrint = $005184
 
 ; Macro for checking free play ----------------------------
@@ -33,18 +36,20 @@ POST macro
 	move.l	(sp)+, d1
 	ENDM
 
-; Disable checksum
-	ORG	$013B1A
-	move.w	#0, d2
-	rts
+; Fix checksum
+; TODO: This was done by hand - it would be best if this was done at build time
+	ORG	$0000C0
+	dc.l	$9BDA71C3
+	ORG	$0000C4
+	dc.l	$20FD8682
 
-; Disable credit insert
+; Disable credit copy from sub CPU's count.
 	ORG	$000314
 	jsr	credit_count_from_sub_cpu
 	nop
 	nop
 
-; Disable subtraction of credits from sub-CPU's count
+; Disable subtraction of credits from sub CPU's count.
 	ORG	$000EE8
 	jsr	sub_credit_on_start
 	nop
