@@ -1,0 +1,23 @@
+Out Zone Free Play patch
+========================
+
+This patch adds a Free Play option to Toaplan's Out Zone. This is based on the
+main ROM revision, from the set "outzone.zip".
+
+Dependencies
+------------
+
+GNU Make, The Macro Assembler AS, and my own utility BSplit are used.
+
+Usage
+-----
+
+Combine the two original program roms into an image called `prg.orig`, which
+the assembler will then patch over. This can be done with bsplit:
+
+`bsplit c prg1.bin prg2.bin prg.orig`
+
+AS, on linux, is given the binary name `asl`. `asw` on Windows will work also.
+At this point, call `make`. Deinterleaved binaries `prg1.bin` and `prg2.bin`
+will be created. These may be burned on to 27C010 or equivelant ROMs, and
+installed on an Out Zone PCB.
